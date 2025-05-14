@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meadowbrook Deed Finder</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>🏡 Meadowbrook Deed Restrictions</h1>
+    <p id="status">Detecting your location...</p>
+    
+    <div id="match-result" class="hidden">
+      <p><strong>Matched Address:</strong> <span id="match-address"></span></p>
+      <p><strong>Resident:</strong> <span id="match-resident"></span></p>
+      <a id="deed-link" href="#" target="_blank">📄 View Deed Restrictions</a>
+    </div>
+
+    <div id="manual-search" class="hidden">
+      <input type="text" id="address-input" placeholder="Search your address..." />
+      <!-- Hook up autocomplete or manual entry -->
+    </div>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
