@@ -2,8 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const haversine = require('haversine-distance');
 const path = require('path');
-app.use(express.static(path.join(__dirname, 'public')));
-
 
 const app = express();
 app.use(cors()); 
@@ -60,3 +58,4 @@ app.get('/match-location', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🔥 Server running on port ${PORT}`));
+app.use(express.static(path.join(__dirname, 'public')));
