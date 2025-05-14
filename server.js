@@ -1,8 +1,12 @@
+const fetch = require('node-fetch');
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxkfCiX75_XsjrHU3zeA5M082qk9jI9t-yVT3dR9RZHRxtVANAVpYXO_caX-11FHzA/exec';
+
 const express = require('express');
 const cors = require('cors');
 const haversine = require('haversine-distance');
 const path = require('path');
 const { loadResidentData } = require('./loader');
+
 
 const app = express();
 app.use(cors());
@@ -38,6 +42,31 @@ app.get('/match-location', (req, res) => {
   }
 
   const match = findClosestAddress(lat, lng, residents);
+  const logData = {
+  ip: req.ip,
+  lat,
+  lng,
+  address: match?.address || '',
+  resident: match?.resident || '',
+  deed: match?.deed || ''
+};
+
+fetch(GOOGLE_SHEET_URL, {
+  method: 'POST',
+  body: JSON.stringify(logData),
+  headers: { 'Content-Type': 'application/json' }
+}).then(() => {
+  console.log(`[LOGGED] ${logData.ip} → ${logData.address || 'NO MATCH'}`);
+}).catch(err => {
+  console.error('❌ Google Sheet log failed:', err.message);
+});
+
+   if (match) {
+    console.log(`[MATCH ✅] ${new Date().toISOString()} | ${req.ip} → ${match.address} (${match.resident})`);
+  } else {
+    console.log(`[NO MATCH ❌] ${new Date().toISOString()} | ${req.ip} → ${lat}, ${lng}`);
+  }
+
   res.json({ match });
 });
 
@@ -52,3 +81,4 @@ app.get('/search-addresses', (req, res) => {
 
   res.json(matches);
 });
+
