@@ -2,47 +2,31 @@ const express = require('express');
 const cors = require('cors');
 const haversine = require('haversine-distance');
 const path = require('path');
+const { loadResidentData } = require('./loader');
 
 const app = express();
-app.use(cors()); 
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
+const residents = loadResidentData(); // Load once on boot
 
-app.listen(PORT, () => {
-  console.log(`🔥 Server running on port ${PORT}`);
-});
-
-const addressPoints = [
-  {
-    address: '123 Meadowbrook Ln',
-    lat: 38.123456,
-    lng: -85.456789,
-    deed: 'meadowbrook_hills_3.pdf',
-    resident: 'Andrew Buck'
-  },
-  {
-    address: '456 Rolling Hills Dr',
-    lat: 38.124111,
-    lng: -85.455000,
-    deed: 'meadowbrook_hills_1.pdf',
-    resident: 'Tina Miller'
-  }
-];
-
-function findClosest(lat, lng) {
-  const inputPoint = { latitude: lat, longitude: lng };
+function findClosestAddress(inputLat, inputLng, rows) {
+  const inputPoint = { latitude: inputLat, longitude: inputLng };
   let closest = null;
   let shortest = Infinity;
 
-  for (const entry of addressPoints) {
-    const dist = haversine(inputPoint, { latitude: entry.lat, longitude: entry.lng });
+  for (const row of rows) {
+    if (!row.lat || !row.lng) continue;
+    const point = { latitude: row.lat, longitude: row.lng };
+    const dist = haversine(inputPoint, point);
     if (dist < shortest) {
       shortest = dist;
-      closest = entry;
+      closest = row;
     }
   }
 
-  return shortest < 100 ? closest : null; // 100 meters threshold
+  return shortest < 100 ? closest : null;
 }
 
 app.get('/match-location', (req, res) => {
@@ -53,9 +37,18 @@ app.get('/match-location', (req, res) => {
     return res.status(400).json({ error: 'Missing lat/lng' });
   }
 
-  const match = findClosest(lat, lng);
+  const match = findClosestAddress(lat, lng, residents);
   res.json({ match });
 });
 
 app.listen(PORT, () => console.log(`🔥 Server running on port ${PORT}`));
-app.use(express.static(path.join(__dirname, 'public')));
+app.get('/search-addresses', (req, res) => {
+  const query = (req.query.query || '').toLowerCase();
+  if (!query) return res.json([]);
+
+  const matches = residents.filter(row =>
+    row.address.toLowerCase().includes(query)
+  ).slice(0, 10); // limit results
+
+  res.json(matches);
+});

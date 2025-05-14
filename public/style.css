@@ -15,3 +15,20 @@ input[type="text"] {
   font-size: 1rem;
   width: 100%;
 }
+#autocomplete-list {
+  list-style: none;
+  padding: 0;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+}
+
+.autocomplete-item {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.autocomplete-item:hover {
+  background-color: #f0f0f0;
+}
