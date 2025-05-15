@@ -5,7 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meadowbrook Hills Deed Restrictions</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Leaflet CSS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-o9N1jhs8kLhXZ5RYSmn3S+NSWx7Fbf9A6xKyf1g1Fco="
+  crossorigin=""
+/>
 </head>
+ <!-- Leaflet JS -->
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-oO/Zf9wUE1cLQZ1c6B/Ee04De2m8aI6v1t3qxn0pn6c="
+  crossorigin=""
+></script>
+
 <body>
   <main>
     <h1>🏡 Meadowbrook Hills Deed Restrictions</h1>
@@ -15,9 +29,19 @@
     <div id="match-result" class="hidden">
       <p><strong>Matched Address:</strong> <span id="match-address"></span></p>
       <p><strong>Resident:</strong> <span id="match-resident"></span></p>
-      <a id="deed-link" href="#" target="_blank">📄 View Your Deed Restrictions</a>
+      <p><strong>All Owners:</strong> <span id="match-owners"></span></p>
+      <p id="not-your-name" class="hidden">
+      <em>Not your name? <a href="https://www.meadowbrookhills.com/update-your-contact-info" target="_blank">Update your contact info here</a>.</em>
+      </p>
+      <p><strong>Parcel Number:</strong> <span id="match-parcel"></span></p>
+      <p><strong>Subdivision:</strong> <span id="match-subdivision"></span></p>
+      <a id="deed-link" href="#" target="_blank">📄 View Your Deed Restrictions In A New Window</a>
     </div>
-
+    <div id="deed-pdf-viewer" class="hidden">
+      <h3>📄 View Deed Restriction Document</h3>
+      <iframe id="deed-pdf" width="100%" height="600" style="border: 1px solid #ccc;"></iframe>
+      <p><a id="download-deed" href="#" download>⬇️ Download PDF</a></p>
+    </div>
     <!-- Home Facts Dashboard -->
     <div id="home-facts" class="home-facts hidden">
       <h3>🏠 Home Facts</h3>
@@ -28,6 +52,13 @@
         <li><strong>Baths:</strong> <span id="fact-baths"></span></li>
         <li><strong>Lot Size:</strong> <span id="fact-lot-size"></span></li>
         <li><strong>Zoning:</strong> <span id="fact-zoning"></span></li>
+        <li><strong>Property Type:</strong> <span id="fact-property-type"></span></li>
+        <li><strong>Garage:</strong> <span id="fact-garage"></span></li>
+        <li><strong>Fireplace:</strong> <span id="fact-fireplace"></span></li>
+        <li><strong>Pool:</strong> <span id="fact-pool"></span></li>
+        <li><strong>Stories:</strong> <span id="fact-stories"></span></li>
+        <li><strong>Acreage:</strong> <span id="fact-acreage"></span></li>
+        <li><strong>Purchase Date:</strong> <span id="fact-purchase-date"></span></li>
       </ul>
     </div>
 
@@ -44,64 +75,98 @@
       <ul id="autocomplete-list"></ul>
     </div>
 
-    <!-- Subdivision Reference Table -->
-    <section id="subdivision-reference" style="margin-top: 3rem;">
-      <h2>📍 Subdivision Address Lookup Reference</h2>
-      <table class="subdivision-table">
-        <tbody>
-          <tr><th colspan="2">Meadowbrook Forest</th></tr>
-          <tr><td>Lujon</td><td>From and including 21441 Lujon N. to end (sign for adjoining sub)</td></tr>
-          <tr><td>Lujon Ct.</td><td></td></tr>
-          <tr><td>Klarr</td><td></td></tr>
-          <tr><td>Beauford</td><td>From and not including 21603 Beauford to Klarr</td></tr>
-
-          <tr><th colspan="2">Meadowbrook Hills #1</th></tr>
-          <tr><td>37866 Tralee Trail</td><td></td></tr>
-          <tr><td>Rhonswood</td><td>E. of Lujon</td></tr>
-          <tr><td>Dungarran Ct.</td><td></td></tr>
-          <tr><td>Halsted</td><td></td></tr>
-          <tr><td>8 Mile</td><td>E. of Lujon</td></tr>
-
-          <tr><th colspan="2">Meadowbrook Hills #2</th></tr>
-          <tr><td>Tralee Trail</td><td>Except for 37866 Tralee Trail</td></tr>
-          <tr><td>Tralee Trail Ct.</td><td></td></tr>
-          <tr><td>Centerfarm</td><td></td></tr>
-
-          <tr><th colspan="2">Meadowbrook Hills #3</th></tr>
-          <tr><td>Southfarm</td><td>E. of Lujon</td></tr>
-          <tr><td>Southfarm Ct.</td><td></td></tr>
-          <tr><td>Connaught</td><td></td></tr>
-
-          <tr><th colspan="2">Meadowbrook Hills #4</th></tr>
-          <tr><td>Colfax</td><td></td></tr>
-          <tr><td>Eastfarm</td><td></td></tr>
-          <tr><td>Eastfarm Ct.</td><td></td></tr>
-          <tr><td>Woodfarm</td><td>Except for 21481 Woodfarm and 21459 Woodfarm</td></tr>
-
-          <tr><th colspan="2">Meadowbrook Hills</th></tr>
-          <tr><td>Rhonswood Ct.</td><td></td></tr>
-          <tr><td>Rhonswood</td><td>W. of Lujon</td></tr>
-          <tr><td>Westfarm</td><td></td></tr>
-          <tr><td>Silken Glen</td><td></td></tr>
-          <tr><td>Lujon</td><td>S. of Rhonswood</td></tr>
-          <tr><td>Southfarm</td><td>W. of Lujon</td></tr>
-          <tr><td>8 Mile W</td><td>6 Homes: 38520 to and including 38714</td></tr>
-          <tr><td>Lujon N.</td><td>From Rhonswood to, but not including 21238 Lujon</td></tr>
-
-          <tr><th colspan="2">Meadowbrook Woods</th></tr>
-          <tr><td>Woodfarm</td><td>21481 and 21459 Woodfarm</td></tr>
-          <tr><td>Beauford</td><td>From Lujon to include 21603 Beauford</td></tr>
-          <tr><td>Beauford Ct.</td><td>To include 21582 Beauford Ct, but not including 21560 Beauford Ct</td></tr>
-          <tr><td>Woodhill</td><td></td></tr>
-          <tr><td>Northfarm</td><td></td></tr>
-          <tr><td>Westfarm Ct</td><td>21117 and 21129</td></tr>
-          <tr><td>Lujon</td><td>From and including 21238 Lujon N. to and including 21410 Lujon</td></tr>
-        </tbody>
-      </table>
+    <!-- Map Container -->
+    <section id="map-container" style="margin: 2rem 0;">
+      <h2>🗺️ Meadowbrook Hills Property Map</h2>
+      <div id="map" style="height: 500px; border: 1px solid #ccc;"></div>
     </section>
+
+    <!-- Subdivision Reference Table -->
+   <section id="subdivision-reference" style="margin-top: 3rem;">
+  <h2>📍 Subdivision Address Lookup Reference</h2>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Forest</h3>
+    <ul>
+      <li><strong>Lujon:</strong> From and including 21441 Lujon N. to end (sign for adjoining sub)</li>
+      <li>Lujon Ct.</li>
+      <li>Klarr</li>
+      <li><strong>Beauford:</strong> From and not including 21603 Beauford to Klarr</li>
+    </ul>
+  </div>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Hills #1</h3>
+    <ul>
+      <li>37866 Tralee Trail</li>
+      <li><strong>Rhonswood:</strong> E. of Lujon</li>
+      <li>Dungarran Ct.</li>
+      <li>Halsted</li>
+      <li><strong>8 Mile:</strong> E. of Lujon</li>
+    </ul>
+  </div>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Hills #2</h3>
+    <ul>
+      <li><strong>Tralee Trail:</strong> Except for 37866 Tralee Trail</li>
+      <li>Tralee Trail Ct.</li>
+      <li>Centerfarm</li>
+    </ul>
+  </div>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Hills #3</h3>
+    <ul>
+      <li><strong>Southfarm:</strong> E. of Lujon</li>
+      <li>Southfarm Ct.</li>
+      <li>Connaught</li>
+    </ul>
+  </div>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Hills #4</h3>
+    <ul>
+      <li>Colfax</li>
+      <li>Eastfarm</li>
+      <li>Eastfarm Ct.</li>
+      <li><strong>Woodfarm:</strong> Except for 21481 Woodfarm and 21459 Woodfarm</li>
+    </ul>
+  </div>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Hills</h3>
+    <ul>
+      <li>Rhonswood Ct.</li>
+      <li><strong>Rhonswood:</strong> W. of Lujon</li>
+      <li>Westfarm</li>
+      <li>Silken Glen</li>
+      <li><strong>Lujon:</strong> S. of Rhonswood</li>
+      <li><strong>Southfarm:</strong> W. of Lujon</li>
+      <li><strong>8 Mile W:</strong> 6 Homes: 38520 to and including 38714</li>
+      <li><strong>Lujon N.:</strong> From Rhonswood to, but not including 21238 Lujon</li>
+    </ul>
+  </div>
+
+  <div class="subdivision-group">
+    <h3>Meadowbrook Woods</h3>
+    <ul>
+      <li><strong>Woodfarm:</strong> 21481 and 21459 Woodfarm</li>
+      <li><strong>Beauford:</strong> From Lujon to include 21603 Beauford</li>
+      <li><strong>Beauford Ct.:</strong> To include 21582 Beauford Ct, but not including 21560 Beauford Ct</li>
+      <li>Woodhill</li>
+      <li>Northfarm</li>
+      <li><strong>Westfarm Ct:</strong> 21117 and 21129</li>
+      <li><strong>Lujon:</strong> From and including 21238 Lujon N. to and including 21410 Lujon</li>
+    </ul>
+  </div>
+</section>
+
   </main>
 
   <!-- Your one and only JS entry point -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="app.js" defer></script>
+
 </body>
 </html>

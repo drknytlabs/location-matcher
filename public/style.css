@@ -139,3 +139,46 @@ button:hover {
     width: 100%;
   }
 }
+v#deed-pdf-viewer {
+  margin-top: 1.5rem;
+}
+
+#deed-pdf {
+  border-radius: 4px;
+}
+
+#download-deed {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  text-decoration: none;
+  color: #0077cc;
+}
+
+#download-deed:hover {
+  text-decoration: underline;
+}
+.subdivision-group {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+.subdivision-group h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.subdivision-group ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.subdivision-group li {
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
