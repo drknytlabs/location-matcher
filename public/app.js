@@ -1,7 +1,54 @@
+const apiUrl = "/match-location";
+const status = document.getElementById("status");
+const result = document.getElementById("match-result");
+const manual = document.getElementById("manual-search");
+
 const input = document.getElementById("address-input");
 const list = document.getElementById("autocomplete-list");
 const searchBtn = document.getElementById("address-search-btn");
 
+// ==========================
+// GEOLOCATION MATCH ON LOAD
+// ==========================
+async function getCurrentPosition() {
+  return new Promise((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    })
+  );
+}
+
+async function tryGeolocation() {
+  try {
+    const pos = await getCurrentPosition();
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+
+    status.textContent = `📍 Location found. Matching...`;
+
+    const res = await fetch(`${apiUrl}?lat=${lat}&lng=${lng}`);
+    const data = await res.json();
+
+    if (data.match) {
+      showMatchResult(data.match);
+      status.textContent = `✅ Address matched!`;
+    } else {
+      throw new Error("No match");
+    }
+  } catch (err) {
+    console.warn("Geolocation failed or no match:", err);
+    status.textContent = "⚠️ Could not detect a match. Search manually.";
+    manual.classList.remove("hidden");
+  }
+}
+
+tryGeolocation();
+
+// ==========================
+// AUTOCOMPLETE SEARCH LOGIC
+// ==========================
 async function searchAddresses(query) {
   const res = await fetch(`/search-addresses?query=${encodeURIComponent(query)}`);
   return await res.json();
@@ -26,7 +73,7 @@ input.addEventListener("input", async () => {
   showMatches(matches);
 });
 
-input.addEventListener("keydown", async (e) => {
+input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     handleSearchSubmit();
@@ -34,6 +81,14 @@ input.addEventListener("keydown", async (e) => {
 });
 
 searchBtn.addEventListener("click", handleSearchSubmit);
+
+list.addEventListener("click", (e) => {
+  const item = e.target.closest(".autocomplete-item");
+  if (!item) return;
+
+  input.value = item.dataset.address;
+  handleSearchSubmit();
+});
 
 async function handleSearchSubmit() {
   const query = input.value.trim();
@@ -49,14 +104,9 @@ async function handleSearchSubmit() {
   list.innerHTML = '';
 }
 
-list.addEventListener("click", (e) => {
-  const item = e.target.closest(".autocomplete-item");
-  if (!item) return;
-
-  input.value = item.dataset.address;
-  handleSearchSubmit();
-});
-
+// ==========================
+// RESULT DISPLAY SHARED FUNC
+// ==========================
 function showMatchResult(match) {
   document.getElementById("match-address").textContent = match.address;
   document.getElementById("match-resident").textContent = match.resident;
