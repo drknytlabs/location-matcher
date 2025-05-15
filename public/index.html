@@ -14,16 +14,17 @@
     <div id="match-result" class="hidden">
       <p><strong>Matched Address:</strong> <span id="match-address"></span></p>
       <p><strong>Resident:</strong> <span id="match-resident"></span></p>
-      <a id="deed-link" href="#" target="_blank">📄 View Deed Restrictions</a>
+      <a id="deed-link" href="#" target="_blank">📄 View Your Deed Restrictions</a>
     </div>
-
-    <div id="manual-search" class="hidden">
-      <input type="text" id="address-input" placeholder="Search your address..." />
-      <!-- Hook up autocomplete or manual entry -->
-    </div>
-    <div id="manual-search" class="hidden">
+    <div id="no-match" class="hidden">
+      <p>Your current coordinates do not appear to correspond to any homes in our association. Please utilize manual search option</p>
+      <button id="manual-search-btn">Search Manually</button>
+<div id="manual-search" class="hidden">
   <input type="text" id="address-input" placeholder="Search your address..." autocomplete="off" />
+  <button id="address-search-btn">Search</button>
   <ul id="autocomplete-list"></ul>
+</div>
+
 </div>
 
   </main>
