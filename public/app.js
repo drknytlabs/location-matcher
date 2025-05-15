@@ -122,8 +122,7 @@ function showMatchResult(match) {
   document.getElementById("fact-baths").textContent = match.baths || 'N/A';
   document.getElementById("fact-lot-size").textContent = match.lot_size_sqft || 'N/A';
   document.getElementById("fact-zoning").textContent = match.zoning || 'N/A';
-  document.getElementById("fact-assessed").textContent = formatCurrency(match.assessed_value);
-  document.getElementById("fact-market").textContent = formatCurrency(match.market_value);
+  
 
   document.getElementById("match-result").classList.remove("hidden");
   document.getElementById("home-facts").classList.remove("hidden");
