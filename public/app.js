@@ -110,6 +110,17 @@ async function handleSearchSubmit() {
 function showMatchResult(match) {
   document.getElementById("match-address").textContent = match.address;
   document.getElementById("match-resident").textContent = match.resident;
+    function formatDeedFilename(deed) {
+    return deed
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-z0-9_]/g, '') + '.pdf';
+  }
+
+  const fileName = formatDeedFilename(match.deed);
+  const link = document.getElementById("deed-link");
+  link.href = `/pdfs/${fileName}`;
+  link.style.display = 'inline-block';
   const link = document.getElementById("deed-link");
   link.href = `/pdfs/${match.deed}`;
   link.style.display = 'inline-block';

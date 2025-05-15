@@ -63,3 +63,27 @@ input[type="text"] {
 .home-facts li:last-child {
   border-bottom: none;
 }
+.subdivision-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 800px;
+  margin-top: 1rem;
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+}
+
+.subdivision-table th {
+  background-color: #ddd;
+  text-align: left;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.subdivision-table td {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+.subdivision-table tr:nth-child(even) td {
+  background-color: #fdfdfd;
+}
