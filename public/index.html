@@ -16,19 +16,52 @@
       <p><strong>Resident:</strong> <span id="match-resident"></span></p>
       <a id="deed-link" href="#" target="_blank">📄 View Your Deed Restrictions</a>
     </div>
+
     <div id="no-match" class="hidden">
-      <p>Your current coordinates do not appear to correspond to any homes in our association. Please utilize manual search option</p>
+      <p>Your current coordinates do not appear to correspond to any homes in our association. Please utilize manual search option.</p>
       <button id="manual-search-btn">Search Manually</button>
-<div id="manual-search" class="hidden">
-  <input type="text" id="address-input" placeholder="Search your address..." autocomplete="off" />
-  <button id="address-search-btn">Search</button>
-  <ul id="autocomplete-list"></ul>
-</div>
+    </div>
 
-</div>
-
+    <div id="manual-search" class="hidden">
+      <input type="text" id="address-input" placeholder="Search your address..." autocomplete="off" />
+      <button id="address-search-btn">Search</button>
+      <ul id="autocomplete-list"></ul>
+    </div>
   </main>
 
   <script src="app.js" defer></script>
 </body>
 </html>
+<script>
+  // This script will handle the autocomplete functionality
+  const addressInput = document.getElementById('address-input');
+  const autocompleteList = document.getElementById('autocomplete-list');
+
+  addressInput.addEventListener('input', function() {
+    const query = this.value;
+    if (!query) {
+      autocompleteList.innerHTML = '';
+      return;
+    }
+
+    // Simulate fetching data from a server
+    const addresses = ['123 Meadow Lane', '456 Oak Street', '789 Pine Avenue'];
+    const filteredAddresses = addresses.filter(address => address.toLowerCase().includes(query.toLowerCase()));
+
+    autocompleteList.innerHTML = '';
+    filteredAddresses.forEach(address => {
+      const li = document.createElement('li');
+      li.textContent = address;
+      li.addEventListener('click', () => {
+        addressInput.value = address;
+        autocompleteList.innerHTML = '';
+      });
+      autocompleteList.appendChild(li);
+    });
+  });
+  addressInput.addEventListener('blur', function() {
+    setTimeout(() => {
+      autocompleteList.innerHTML = '';
+    }, 200);
+  });
+</script> 
