@@ -3,19 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meadowbrook Deed Finder</title>
+  <title>Meadowbrook Hills Deed Restrictions</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main>
     <h1>🏡 Meadowbrook Deed Restrictions</h1>
-    <p id="status">Detecting your location...</p>
+    <p id="status">Sensing your current location...</p>
     
     <div id="match-result" class="hidden">
       <p><strong>Matched Address:</strong> <span id="match-address"></span></p>
       <p><strong>Resident:</strong> <span id="match-resident"></span></p>
       <a id="deed-link" href="#" target="_blank">📄 View Your Deed Restrictions</a>
     </div>
+    <div id="home-facts" class="home-facts hidden">
+    <h3>🏠 Home Facts</h3>
+    <ul>
+      <li><strong>Subdivision:</strong> <span id="fact-subdivision"></span></li>
+      <li><strong>Year Built:</strong> <span id="fact-year-built"></span></li>
+      <li><strong>Bedrooms:</strong> <span id="fact-bedrooms"></span></li>
+      <li><strong>Baths:</strong> <span id="fact-baths"></span></li>
+      <li><strong>Lot Size:</strong> <span id="fact-lot-size"></span></li>
+      <li><strong>Zoning:</strong> <span id="fact-zoning"></span></li>
+      <li><strong>Assessed Value:</strong> <span id="fact-assessed"></span></li>
+      <li><strong>Market Value:</strong> <span id="fact-market"></span></li>
+    </ul>
+  </div>
 
     <div id="no-match" class="hidden">
       <p>Your current coordinates do not appear to correspond to any homes in our association. Please utilize manual search option.</p>

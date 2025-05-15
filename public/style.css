@@ -33,3 +33,33 @@ input[type="text"] {
 .autocomplete-item:hover {
   background-color: #f0f0f0;
 }
+
+.home-facts {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  border-radius: 6px;
+  max-width: 500px;
+}
+
+.home-facts h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.home-facts ul {
+  padding-left: 0;
+  list-style: none;
+  margin: 0;
+}
+
+.home-facts li {
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.home-facts li:last-child {
+  border-bottom: none;
+}
