@@ -40,7 +40,7 @@ async function tryGeolocation() {
   } catch (err) {
     console.warn("Geolocation failed or no match:", err);
     status.textContent = "⚠️ Could not detect a match. Search manually.";
-    manual.classList.remove("hidden");
+    manual?.classList.remove("hidden");
   }
 }
 
@@ -62,7 +62,7 @@ function showMatches(matches) {
   `).join('');
 }
 
-input.addEventListener("input", async () => {
+input?.addEventListener("input", async () => {
   const query = input.value.trim();
   if (!query) {
     list.innerHTML = '';
@@ -73,16 +73,16 @@ input.addEventListener("input", async () => {
   showMatches(matches);
 });
 
-input.addEventListener("keydown", (e) => {
+input?.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     handleSearchSubmit();
   }
 });
 
-searchBtn.addEventListener("click", handleSearchSubmit);
+searchBtn?.addEventListener("click", handleSearchSubmit);
 
-list.addEventListener("click", (e) => {
+list?.addEventListener("click", (e) => {
   const item = e.target.closest(".autocomplete-item");
   if (!item) return;
 
@@ -110,7 +110,8 @@ async function handleSearchSubmit() {
 function showMatchResult(match) {
   document.getElementById("match-address").textContent = match.address;
   document.getElementById("match-resident").textContent = match.resident;
-    function formatDeedFilename(deed) {
+
+  function formatDeedFilename(deed) {
     return deed
       .toLowerCase()
       .replace(/\s+/g, '_')
@@ -121,10 +122,6 @@ function showMatchResult(match) {
   const link = document.getElementById("deed-link");
   link.href = `/pdfs/${fileName}`;
   link.style.display = 'inline-block';
-  const link = document.getElementById("deed-link");
-  link.href = `/pdfs/${match.deed}`;
-  link.style.display = 'inline-block';
-  document.getElementById("match-result").classList.remove("hidden");
 
   // Populate home facts
   document.getElementById("fact-subdivision").textContent = match.subdivision || 'N/A';
@@ -136,7 +133,7 @@ function showMatchResult(match) {
   
 
   document.getElementById("match-result").classList.remove("hidden");
-  document.getElementById("home-facts").classList.remove("hidden");
+  document.getElementById("home-facts")?.classList.remove("hidden");
 }
 
 function formatCurrency(val) {

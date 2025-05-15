@@ -1,28 +1,48 @@
+/* Base layout */
 body {
   font-family: system-ui, sans-serif;
   max-width: 600px;
   margin: auto;
   padding: 2rem;
   line-height: 1.5;
+  color: #222;
+  background-color: #fff;
 }
 
-.hidden {
-  display: none;
-}
-
+/* General input styling */
 input[type="text"] {
   padding: 0.5rem;
   font-size: 1rem;
   width: 100%;
+  margin-bottom: 0.5rem;
 }
+
+/* Buttons */
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+/* Autocomplete dropdown */
 #autocomplete-list {
   list-style: none;
   padding: 0;
+  margin: 0;
   border: 1px solid #ccc;
   max-height: 200px;
   overflow-y: auto;
   background: white;
-  z-index: 1000
+  z-index: 1000;
 }
 
 .autocomplete-item {
@@ -34,6 +54,19 @@ input[type="text"] {
   background-color: #f0f0f0;
 }
 
+/* Result Sections */
+.hidden {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.visible {
+  display: block;
+  opacity: 1;
+}
+
+/* Home Facts Box */
 .home-facts {
   margin-top: 1.5rem;
   padding: 1rem;
@@ -63,6 +96,8 @@ input[type="text"] {
 .home-facts li:last-child {
   border-bottom: none;
 }
+
+/* Subdivision Reference Table */
 .subdivision-table {
   border-collapse: collapse;
   width: 100%;
@@ -86,4 +121,21 @@ input[type="text"] {
 
 .subdivision-table tr:nth-child(even) td {
   background-color: #fdfdfd;
+}
+
+/* Mobile Responsive Layout */
+@media (max-width: 600px) {
+  body {
+    padding: 1rem;
+  }
+
+  .home-facts,
+  .subdivision-table {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  button {
+    width: 100%;
+  }
 }
