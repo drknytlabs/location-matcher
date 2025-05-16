@@ -36,8 +36,6 @@ function addPropertyMarker({ lat, lng, address, subdivision }) {
 
   marker.bindPopup(`<strong>${address}</strong><br>${subdivision}`);
 }
-
-
 // ==========================
 // GEOLOCATION MATCH ON LOAD
 // ==========================
@@ -149,18 +147,16 @@ function showMatchResult(match) {
 } else {
   nameWarning.classList.add("hidden");
 }
+  const filePath = `/pdfs/${match.deed}`;
 
-  function formatDeedFilename(deed) {
-    return deed
-      .toLowerCase()
-      .replace(/\s+/g, '_')
-      .replace(/[^a-z0-9_]/g, '') + '.pdf';
-  }
-
-  const fileName = formatDeedFilename(match.deed);
   const link = document.getElementById("deed-link");
-  link.href = `/pdfs/${match.deed}.pdf`;
+  link.href = filePath;
   link.style.display = 'inline-block';
+
+  document.getElementById("deed-pdf").src = filePath;
+  document.getElementById("download-deed").href = filePath;
+  document.getElementById("download-deed").download = `${match.deed}`;
+  document.getElementById("deed-pdf-viewer")?.classList.remove("hidden");
 
   // Populate home facts
   document.getElementById("match-owners").textContent = match.all_owners || 'N/A';

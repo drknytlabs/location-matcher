@@ -6,20 +6,13 @@
   <title>Meadowbrook Hills Deed Restrictions</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Leaflet CSS -->
-<link
+  <link
   rel="stylesheet"
   href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-o9N1jhs8kLhXZ5RYSmn3S+NSWx7Fbf9A6xKyf1g1Fco="
   crossorigin=""
-/>
+  />
 </head>
- <!-- Leaflet JS -->
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-oO/Zf9wUE1cLQZ1c6B/Ee04De2m8aI6v1t3qxn0pn6c="
-  crossorigin=""
-></script>
-
 <body>
   <main>
     <h1>🏡 Meadowbrook Hills Deed Restrictions</h1>
@@ -82,20 +75,20 @@
     </section>
 
     <!-- Subdivision Reference Table -->
-   <section id="subdivision-reference" style="margin-top: 3rem;">
-  <h2>📍 Subdivision Address Lookup Reference</h2>
+    <section id="subdivision-reference" style="margin-top: 3rem;">
+    <h2>📍 Subdivision Address Lookup Reference</h2>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Forest</h3>
-    <ul>
+      <ul>
       <li><strong>Lujon:</strong> From and including 21441 Lujon N. to end (sign for adjoining sub)</li>
       <li>Lujon Ct.</li>
       <li>Klarr</li>
       <li><strong>Beauford:</strong> From and not including 21603 Beauford to Klarr</li>
     </ul>
-  </div>
+    </div>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Hills #1</h3>
     <ul>
       <li>37866 Tralee Trail</li>
@@ -104,27 +97,27 @@
       <li>Halsted</li>
       <li><strong>8 Mile:</strong> E. of Lujon</li>
     </ul>
-  </div>
+    </div>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Hills #2</h3>
     <ul>
       <li><strong>Tralee Trail:</strong> Except for 37866 Tralee Trail</li>
       <li>Tralee Trail Ct.</li>
       <li>Centerfarm</li>
     </ul>
-  </div>
+    </div>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Hills #3</h3>
     <ul>
       <li><strong>Southfarm:</strong> E. of Lujon</li>
       <li>Southfarm Ct.</li>
       <li>Connaught</li>
     </ul>
-  </div>
+    </div>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Hills #4</h3>
     <ul>
       <li>Colfax</li>
@@ -132,9 +125,9 @@
       <li>Eastfarm Ct.</li>
       <li><strong>Woodfarm:</strong> Except for 21481 Woodfarm and 21459 Woodfarm</li>
     </ul>
-  </div>
+    </div>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Hills</h3>
     <ul>
       <li>Rhonswood Ct.</li>
@@ -146,9 +139,9 @@
       <li><strong>8 Mile W:</strong> 6 Homes: 38520 to and including 38714</li>
       <li><strong>Lujon N.:</strong> From Rhonswood to, but not including 21238 Lujon</li>
     </ul>
-  </div>
+    </div>
 
-  <div class="subdivision-group">
+    <div class="subdivision-group">
     <h3>Meadowbrook Woods</h3>
     <ul>
       <li><strong>Woodfarm:</strong> 21481 and 21459 Woodfarm</li>
@@ -159,14 +152,22 @@
       <li><strong>Westfarm Ct:</strong> 21117 and 21129</li>
       <li><strong>Lujon:</strong> From and including 21238 Lujon N. to and including 21410 Lujon</li>
     </ul>
-  </div>
-</section>
-
+    </div>
+    </section>
   </main>
 
   <!-- Your one and only JS entry point -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="app.js" defer></script>
+  <!-- Leaflet JS (FIRST) -->
+  <script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-oO/Zf9wUE1cLQZ1c6B/Ee04De2m8aI6v1t3qxn0pn6c="
+  crossorigin=""
+  ></script>
 
+  <!-- html2pdf for PDF download support -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Your actual app logic -->
+  <script src="app.js" defer></script>
 </body>
 </html>
