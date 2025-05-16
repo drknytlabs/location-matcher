@@ -137,26 +137,44 @@ async function handleSearchSubmit() {
 // RESULT DISPLAY SHARED FUNC
 // ==========================
 function showMatchResult(match) {
+  // Main data display
   document.getElementById("match-address").textContent = match.address;
   document.getElementById("match-resident").textContent = match.resident;
+
+  // Owner name logic
   const isLikelyOwner = match.all_owners?.toLowerCase().includes(match.resident?.toLowerCase());
   const nameWarning = document.getElementById("not-your-name");
-
   if (!isLikelyOwner) {
-  nameWarning.classList.remove("hidden");
-} else {
-  nameWarning.classList.add("hidden");
-}
-  const filePath = `/pdfs/${match.deed}`;
+    nameWarning.classList.remove("hidden");
+  } else {
+    nameWarning.classList.add("hidden");
+  }
 
+  // PDF link setup
+  const filePath = `/pdfs/${match.deed}`;
   const link = document.getElementById("deed-link");
   link.href = filePath;
   link.style.display = 'inline-block';
 
+  // Embedded PDF viewer
   document.getElementById("deed-pdf").src = filePath;
   document.getElementById("download-deed").href = filePath;
-  document.getElementById("download-deed").download = `${match.deed}`;
+  document.getElementById("download-deed").download = match.deed;
   document.getElementById("deed-pdf-viewer")?.classList.remove("hidden");
+
+  // Home facts
+  document.getElementById("fact-subdivision").textContent = match.subdivision || 'N/A';
+  document.getElementById("fact-year-built").textContent = match.year_built || 'N/A';
+  document.getElementById("fact-bedrooms").textContent = match.bedrooms || 'N/A';
+  document.getElementById("fact-baths").textContent = match.baths || 'N/A';
+  document.getElementById("fact-lot-size").textContent = match.lot_size_sqft || 'N/A';
+  document.getElementById("fact-zoning").textContent = match.zoning || 'N/A';
+  document.getElementById("fact-property-type").textContent = match.property_type || 'N/A';
+  document.getElementById("fact-garage").textContent = match.garage_type || 'N/A';
+  document.getElementById("fact-fireplace").textContent = match.fireplace || 'N/A';
+  document.getElementById("fact-pool").textContent = match.pool || 'N/A';
+  document.getElementById("fact-stories").textContent = match.stories || '
+
 
   // Populate home facts
   document.getElementById("match-owners").textContent = match.all_owners || 'N/A';
