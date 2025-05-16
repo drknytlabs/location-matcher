@@ -2,10 +2,34 @@ const apiUrl = "/match-location";
 const status = document.getElementById("status");
 const result = document.getElementById("match-result");
 const manual = document.getElementById("manual-search");
-
 const input = document.getElementById("address-input");
 const list = document.getElementById("autocomplete-list");
 const searchBtn = document.getElementById("address-search-btn");
+window.addEventListener("DOMContentLoaded", () => {
+  const map = L.map('map').setView([42.441, -83.424], 15);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // add markers after init
+  // Sample: Add marker manually (replace this with dynamic loading)
+function addPropertyMarker({ lat, lng, address, subdivision }) {
+  if (!lat || !lng) return;
+
+  const marker = L.marker([lat, lng]).addTo(map);
+  marker.bindPopup(`<strong>${address}</strong><br>${subdivision}`);
+}
+// Example: Add a marker for the matched property
+const matchedProperty = {
+  lat: 42.441,
+  lng: -83.424,
+  address: "123 Main St",
+  subdivision: "Downtown"
+};
+addPropertyMarker(matchedProperty);
+
+});
 const subdivisionColors = {
   "Meadowbrook Forest": "green",
   "Meadowbrook Hills #1": "blue",
@@ -156,7 +180,7 @@ function showMatchResult(match) {
   }
 
   // PDF link setup
-  const filePath = `/pdfs/${match.deed}`;
+  const filePath = `/pdfs/${match.deed}.pdf`;
   const link = document.getElementById("deed-link");
   link.href = filePath;
   link.style.display = 'inline-block';
@@ -164,7 +188,7 @@ function showMatchResult(match) {
   // Embedded PDF viewer
   document.getElementById("deed-pdf").src = filePath;
   document.getElementById("download-deed").href = filePath;
-  document.getElementById("download-deed").download = match.deed;
+  document.getElementById("download-deed").download = `${match.deed}.pdf`;
   document.getElementById("deed-pdf-viewer")?.classList.remove("hidden");
 
   // Home facts
@@ -236,25 +260,3 @@ document.getElementById("download-pdf-btn")?.addEventListener("click", () => {
     .from(element)
     .save();
 });
-// Initialize the map
-const map = L.map('map').setView([42.441, -83.424], 15); // Adjust zoom & center to your neighborhood
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Sample: Add marker manually (replace this with dynamic loading)
-function addPropertyMarker({ lat, lng, address, subdivision }) {
-  if (!lat || !lng) return;
-
-  const marker = L.marker([lat, lng]).addTo(map);
-  marker.bindPopup(`<strong>${address}</strong><br>${subdivision}`);
-}
-// Example: Add a marker for the matched property
-const matchedProperty = {
-  lat: 42.441,
-  lng: -83.424,
-  address: "123 Main St",
-  subdivision: "Downtown"
-};
-addPropertyMarker(matchedProperty);
