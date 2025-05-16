@@ -50,7 +50,12 @@ async function getCurrentPosition() {
 }
 
 async function tryGeolocation() {
+  const status = document.getElementById("status");
+  const manual = document.getElementById("manual-search");
+
   try {
+    status.textContent = "📍 Getting your location...";
+
     const pos = await getCurrentPosition();
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
@@ -62,13 +67,13 @@ async function tryGeolocation() {
 
     if (data.match) {
       showMatchResult(data.match);
-      status.textContent = `✅ Address matched!`;
+      status.textContent = `✅ Matched: ${data.match.address}`;
     } else {
       throw new Error("No match");
     }
   } catch (err) {
-    console.warn("Geolocation failed or no match:", err);
-    status.textContent = "⚠️ Could not detect a match. Search manually.";
+    console.warn("⚠️ Geolocation failed or no match:", err.message);
+    status.textContent = "⚠️ We couldn't detect your location. Try searching manually.";
     manual?.classList.remove("hidden");
   }
 }
@@ -173,7 +178,10 @@ function showMatchResult(match) {
   document.getElementById("fact-garage").textContent = match.garage_type || 'N/A';
   document.getElementById("fact-fireplace").textContent = match.fireplace || 'N/A';
   document.getElementById("fact-pool").textContent = match.pool || 'N/A';
-  document.getElementById("fact-stories").textContent = match.stories || '
+  document.getElementById("fact-stories").textContent = match.stories || 'N/A';
+  document.getElementById("fact-acreage").textContent = match.acreage ? `${parseFloat(match.acreage).toFixed(2)} acres` : 'N/A';
+  document.getElementById("fact-purchase-date").textContent = match.purchase_date || 'N/A';
+  document.getElementById("fact-purchase-price").textContent = formatCurrency(match.purchase_price) || 'N/A';
 
 
   // Populate home facts
@@ -191,7 +199,6 @@ function showMatchResult(match) {
   document.getElementById("fact-stories").textContent = match.stories || 'N/A';
   document.getElementById("fact-acreage").textContent = match.acreage ? `${parseFloat(match.acreage).toFixed(2)} acres` : 'N/A';
   document.getElementById("fact-purchase-date").textContent = match.purchase_date || 'N/A';
-
 
   document.getElementById("match-result").classList.remove("hidden");
   document.getElementById("home-facts")?.classList.remove("hidden");

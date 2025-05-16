@@ -138,8 +138,11 @@ button:hover {
   button {
     width: 100%;
   }
+  v#deed-pdf-viewer {
+  margin-top: 1.5rem;
 }
-v#deed-pdf-viewer {
+}
+#deed-pdf-viewer {
   margin-top: 1.5rem;
 }
 
