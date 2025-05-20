@@ -5,11 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Meadowbrook Hills Deed Restrictions</title>
   <link rel="stylesheet" href="style.css" />
- <!-- Leaflet CSS + JS in HTML head -->
-  <link
-  rel="stylesheet"href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Mapbox GL JS CSS & JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    .subdivision-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
+    .subdivision-group {
+      flex: 1 1 calc(25% - 2rem);
+      min-width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 1rem;
+      background-color: #f9f9f9;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .subdivision-group:hover {
+      transform: scale(1.03);
+      background-color: #e0f7fa;
+    }
+  </style>
 </head>
 <body>
   <main>
@@ -79,7 +102,7 @@
     <div class="subdivision-grid">
       <div class="subdivision-group">
       <h3>Meadowbrook Forest</h3>
-      <a href="pdfs/meadowbrook-forest.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+      <a href="pdfs/Meadowbrook Forest.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
       <ul>
       <li><strong>Lujon:</strong> From and including 21441 Lujon N. to end (sign for adjoining sub)</li>
       <li>Lujon Ct.</li>
@@ -90,7 +113,7 @@
 
     <div class="subdivision-group">
     <h3>Meadowbrook Hills #1</h3>
-    <a href="pdfs/meadowbrook-hills-1.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+    <a href="pdfs/Meadowbrook Hills 1.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
     <ul>
       <li>37866 Tralee Trail</li>
       <li><strong>Rhonswood:</strong> E. of Lujon</li>
@@ -102,7 +125,7 @@
 
     <div class="subdivision-group">
     <h3>Meadowbrook Hills #2</h3>
-    <a href="pdfs/meadowbrook-hills-2.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+    <a href="pdfs/Meadowbrook Hills 2.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
     <ul>
       <li><strong>Tralee Trail:</strong> Except for 37866 Tralee Trail</li>
       <li>Tralee Trail Ct.</li>
@@ -112,7 +135,7 @@
 
     <div class="subdivision-group">
     <h3>Meadowbrook Hills #3</h3>
-    <a href="pdfs/meadowbrook-hills-3.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+    <a href="pdfs/Meadowbrook Hills 3.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
     <ul>
       <li><strong>Southfarm:</strong> E. of Lujon</li>
       <li>Southfarm Ct.</li>
@@ -122,7 +145,7 @@
 
     <div class="subdivision-group">
     <h3>Meadowbrook Hills #4</h3>
-    <a href="pdfs/meadowbrook-hills-4.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+    <a href="pdfs/Meadowbrook Hills 4.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
     <ul>
       <li>Colfax</li>
       <li>Eastfarm</li>
@@ -133,7 +156,7 @@
 
     <div class="subdivision-group">
     <h3>Meadowbrook Hills</h3>
-    <a href="pdfs/meadowbrook-hills.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+    <a href="pdfs/Meadowbrook Hills.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
     <ul>
       <li>Rhonswood Ct.</li>
       <li><strong>Rhonswood:</strong> W. of Lujon</li>
@@ -148,7 +171,7 @@
 
     <div class="subdivision-group">
     <h3>Meadowbrook Woods</h3>
-    <a href="pdfs/meadowbrook-woods.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
+    <a href="pdfs/Meadowbrook Woodsno 1.pdf" target="_blank" class="view-deed-link">📄 View Deed Restrictions</a>
     <ul>
       <li><strong>Woodfarm:</strong> 21481 and 21459 Woodfarm</li>
       <li><strong>Beauford:</strong> From Lujon to include 21603 Beauford</li>
@@ -164,14 +187,84 @@
   </main>
 
   <!-- Your one and only JS entry point -->
-  <!-- Leaflet JS (FIRST) -->
-  <script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  crossorigin=""
-  ></script>
 
+</script>
   <!-- html2pdf for PDF download support -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Mapbox GL JS Map Initialization -->
+  <script>
+    mapboxgl.accessToken = pk.eyJ1IjoiZHJrbnl0IiwiYSI6ImNtYXcwaWE0cDBhNGMybG9yMzhjMGxkangifQ.QlQN31NlpB8bopMNWoQLLg;
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-83.424, 42.441], // Approximate center of Meadowbrook Hills
+      zoom: 15
+    });
+
+    map.on('load', () => {
+      map.addSource('subdivisions', {
+        'type': 'geojson',
+        'data': {
+          'type': 'FeatureCollection',
+          'features': [
+            {
+              'type': 'Feature',
+              'properties': {
+                'name': 'Meadowbrook Forest',
+                'color': '#1abc9c',
+                'pdf': 'pdfs/meadowbrook-forest.pdf'
+              },
+              'geometry': {
+                'type': 'Polygon',
+                'coordinates': [[
+                  [-83.425, 42.442],
+                  [-83.424, 42.442],
+                  [-83.424, 42.441],
+                  [-83.425, 42.441],
+                  [-83.425, 42.442]
+                ]]
+              }
+            }
+          ]
+        }
+      });
+
+      map.addLayer({
+        'id': 'subdivisions-fill',
+        'type': 'fill',
+        'source': 'subdivisions',
+        'paint': {
+          'fill-color': ['get', 'color'],
+          'fill-opacity': 0.4
+        }
+      });
+
+      map.addLayer({
+        'id': 'subdivisions-outline',
+        'type': 'line',
+        'source': 'subdivisions',
+        'paint': {
+          'line-color': '#000',
+          'line-width': 1
+        }
+      });
+
+      map.on('click', 'subdivisions-fill', (e) => {
+        const pdfLink = e.features[0].properties.pdf;
+        window.open(pdfLink, '_blank');
+      });
+
+      map.on('mouseenter', 'subdivisions-fill', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.on('mouseleave', 'subdivisions-fill', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
+  </script>
 
   <!-- Your actual app logic -->
   <script src="app.js" defer></script>
