@@ -138,8 +138,15 @@ button:hover {
   button {
     width: 100%;
   }
-  v#deed-pdf-viewer {
+  #deed-pdf-viewer {
   margin-top: 1.5rem;
+}
+  #deed-pdf {
+  width: 100vw; /* full viewport width */
+  max-width: none;
+  height: 80vh;
+  border: none;
+  display: block;
 }
 }
 #deed-pdf-viewer {

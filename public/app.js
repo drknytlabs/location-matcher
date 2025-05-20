@@ -1,35 +1,4 @@
 const apiUrl = "/match-location";
-const status = document.getElementById("status");
-const result = document.getElementById("match-result");
-const manual = document.getElementById("manual-search");
-const input = document.getElementById("address-input");
-const list = document.getElementById("autocomplete-list");
-const searchBtn = document.getElementById("address-search-btn");
-window.addEventListener("DOMContentLoaded", () => {
-  const map = L.map('map').setView([42.441, -83.424], 15);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  // add markers after init
-  // Sample: Add marker manually (replace this with dynamic loading)
-function addPropertyMarker({ lat, lng, address, subdivision }) {
-  if (!lat || !lng) return;
-
-  const marker = L.marker([lat, lng]).addTo(map);
-  marker.bindPopup(`<strong>${address}</strong><br>${subdivision}`);
-}
-// Example: Add a marker for the matched property
-const matchedProperty = {
-  lat: 42.441,
-  lng: -83.424,
-  address: "123 Main St",
-  subdivision: "Downtown"
-};
-addPropertyMarker(matchedProperty);
-
-});
 const subdivisionColors = {
   "Meadowbrook Forest": "green",
   "Meadowbrook Hills #1": "blue",
@@ -39,6 +8,9 @@ const subdivisionColors = {
   "Meadowbrook Hills": "darkblue",
   "Meadowbrook Woods": "darkgreen"
 };
+
+let map;
+let currentMatch = null;
 
 function getColorIcon(color) {
   return new L.Icon({
@@ -50,41 +22,55 @@ function getColorIcon(color) {
     shadowSize: [41, 41]
   });
 }
+
 function addPropertyMarker({ lat, lng, address, subdivision }) {
   if (!lat || !lng) return;
-
-  const colorKey = subdivisionColors[subdivision] || 'gray'; // fallback
+  const colorKey = subdivisionColors[subdivision] || 'gray';
   const marker = L.marker([lat, lng], {
     icon: getColorIcon(colorKey)
   }).addTo(map);
-
   marker.bindPopup(`<strong>${address}</strong><br>${subdivision}`);
 }
-// ==========================
-// GEOLOCATION MATCH ON LOAD
-// ==========================
-async function getCurrentPosition() {
-  return new Promise((resolve, reject) =>
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    })
-  );
-}
 
+window.addEventListener("DOMContentLoaded", () => {
+  map = L.map('map').setView([42.441, -83.424], 15);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Load all markers
+  fetch('/api/properties')
+    .then(res => res.json())
+    .then(data => data.forEach(addPropertyMarker))
+    .catch(err => console.error('❌ Failed to load markers:', err));
+
+  // Try geolocation
+  tryGeolocation();
+
+  // Manual search
+  setupAutocomplete();
+});
+
+// 🔍 Geolocation Matching
 async function tryGeolocation() {
   const status = document.getElementById("status");
   const manual = document.getElementById("manual-search");
 
   try {
     status.textContent = "📍 Getting your location...";
-
-    const pos = await getCurrentPosition();
+    const pos = await new Promise((resolve, reject) =>
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      })
+    );
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
 
-    status.textContent = `📍 Location found. Matching...`;
+    L.marker([lat, lng], { icon: getColorIcon('blue') }).addTo(map).bindPopup("You are here").openPopup();
+    map.setView([lat, lng], 15);
 
     const res = await fetch(`${apiUrl}?lat=${lat}&lng=${lng}`);
     const data = await res.json();
@@ -96,167 +82,126 @@ async function tryGeolocation() {
       throw new Error("No match");
     }
   } catch (err) {
-    console.warn("⚠️ Geolocation failed or no match:", err.message);
-    status.textContent = "⚠️ We couldn't detect your location. Try searching manually.";
+    console.warn("⚠️ Geolocation failed:", err.message);
+    status.textContent = "⚠️ Couldn’t detect your location. Try searching manually.";
     manual?.classList.remove("hidden");
   }
 }
 
-tryGeolocation();
-
-// ==========================
-// AUTOCOMPLETE SEARCH LOGIC
-// ==========================
-async function searchAddresses(query) {
-  const res = await fetch(`/search-addresses?query=${encodeURIComponent(query)}`);
-  return await res.json();
-}
-
-function showMatches(matches) {
-  list.innerHTML = matches.map(match => `
-    <li class="autocomplete-item" data-address="${match.address}">
-      ${match.address} — ${match.resident}
-    </li>
-  `).join('');
-}
-
-input?.addEventListener("input", async () => {
-  const query = input.value.trim();
-  if (!query) {
-    list.innerHTML = '';
-    return;
-  }
-
-  const matches = await searchAddresses(query);
-  showMatches(matches);
-});
-
-input?.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    handleSearchSubmit();
-  }
-});
-
-searchBtn?.addEventListener("click", handleSearchSubmit);
-
-list?.addEventListener("click", (e) => {
-  const item = e.target.closest(".autocomplete-item");
-  if (!item) return;
-
-  input.value = item.dataset.address;
-  handleSearchSubmit();
-});
-
-async function handleSearchSubmit() {
-  const query = input.value.trim();
-  if (!query) return;
-
-  const matches = await searchAddresses(query);
-  if (matches.length === 0) {
-    alert("No address match found.");
-    return;
-  }
-
-  showMatchResult(matches[0]);
-  list.innerHTML = '';
-}
-
-// ==========================
-// RESULT DISPLAY SHARED FUNC
-// ==========================
+// 🧠 Match Result Display
 function showMatchResult(match) {
-  // Main data display
+  currentMatch = match;
+
   document.getElementById("match-address").textContent = match.address;
   document.getElementById("match-resident").textContent = match.resident;
+  document.getElementById("match-owners").textContent = match.all_owners || 'N/A';
 
-  // Owner name logic
   const isLikelyOwner = match.all_owners?.toLowerCase().includes(match.resident?.toLowerCase());
-  const nameWarning = document.getElementById("not-your-name");
-  if (!isLikelyOwner) {
-    nameWarning.classList.remove("hidden");
-  } else {
-    nameWarning.classList.add("hidden");
-  }
+  document.getElementById("not-your-name").classList.toggle("hidden", isLikelyOwner);
 
-  // PDF link setup
   const filePath = `/pdfs/${match.deed}.pdf`;
-  const link = document.getElementById("deed-link");
-  link.href = filePath;
-  link.style.display = 'inline-block';
-
-  // Embedded PDF viewer
+  document.getElementById("deed-link").href = filePath;
   document.getElementById("deed-pdf").src = filePath;
   document.getElementById("download-deed").href = filePath;
   document.getElementById("download-deed").download = `${match.deed}.pdf`;
   document.getElementById("deed-pdf-viewer")?.classList.remove("hidden");
 
-  // Home facts
-  document.getElementById("fact-subdivision").textContent = match.subdivision || 'N/A';
-  document.getElementById("fact-year-built").textContent = match.year_built || 'N/A';
-  document.getElementById("fact-bedrooms").textContent = match.bedrooms || 'N/A';
-  document.getElementById("fact-baths").textContent = match.baths || 'N/A';
-  document.getElementById("fact-lot-size").textContent = match.lot_size_sqft || 'N/A';
-  document.getElementById("fact-zoning").textContent = match.zoning || 'N/A';
-  document.getElementById("fact-property-type").textContent = match.property_type || 'N/A';
-  document.getElementById("fact-garage").textContent = match.garage_type || 'N/A';
-  document.getElementById("fact-fireplace").textContent = match.fireplace || 'N/A';
-  document.getElementById("fact-pool").textContent = match.pool || 'N/A';
-  document.getElementById("fact-stories").textContent = match.stories || 'N/A';
-  document.getElementById("fact-acreage").textContent = match.acreage ? `${parseFloat(match.acreage).toFixed(2)} acres` : 'N/A';
-  document.getElementById("fact-purchase-date").textContent = match.purchase_date || 'N/A';
-  document.getElementById("fact-purchase-price").textContent = formatCurrency(match.purchase_price) || 'N/A';
+  const fields = {
+    "fact-subdivision": match.subdivision,
+    "fact-year-built": match.year_built,
+    "fact-bedrooms": match.bedrooms,
+    "fact-baths": match.baths,
+    "fact-lot-size": match.lot_size_sqft,
+    "fact-zoning": match.zoning,
+    "fact-property-type": match.property_type,
+    "fact-garage": match.garage_type,
+    "fact-fireplace": match.fireplace,
+    "fact-pool": match.pool,
+    "fact-stories": match.stories,
+    "fact-acreage": match.acreage ? `${parseFloat(match.acreage).toFixed(2)} acres` : 'N/A',
+    "fact-purchase-date": match.purchase_date,
+    "fact-purchase-price": formatCurrency(match.purchase_price)
+  };
 
-
-  // Populate home facts
-  document.getElementById("match-owners").textContent = match.all_owners || 'N/A';
-  document.getElementById("fact-subdivision").textContent = match.subdivision || 'N/A';
-  document.getElementById("fact-year-built").textContent = match.year_built || 'N/A';
-  document.getElementById("fact-bedrooms").textContent = match.bedrooms || 'N/A';
-  document.getElementById("fact-baths").textContent = match.baths || 'N/A';
-  document.getElementById("fact-lot-size").textContent = match.lot_size_sqft || 'N/A';
-  document.getElementById("fact-zoning").textContent = match.zoning || 'N/A';
-  document.getElementById("fact-property-type").textContent = match.property_type || 'N/A';
-  document.getElementById("fact-garage").textContent = match.garage_type || 'N/A';
-  document.getElementById("fact-fireplace").textContent = match.fireplace || 'N/A';
-  document.getElementById("fact-pool").textContent = match.pool || 'N/A';
-  document.getElementById("fact-stories").textContent = match.stories || 'N/A';
-  document.getElementById("fact-acreage").textContent = match.acreage ? `${parseFloat(match.acreage).toFixed(2)} acres` : 'N/A';
-  document.getElementById("fact-purchase-date").textContent = match.purchase_date || 'N/A';
+  for (const id in fields) {
+    document.getElementById(id).textContent = fields[id] || 'N/A';
+  }
 
   document.getElementById("match-result").classList.remove("hidden");
-  document.getElementById("home-facts")?.classList.remove("hidden");
+  document.getElementById("home-facts").classList.remove("hidden");
+}
+
+// 🔍 Address Search
+function setupAutocomplete() {
+  const input = document.getElementById("address-input");
+  const list = document.getElementById("autocomplete-list");
+  const searchBtn = document.getElementById("address-search-btn");
+
+  input?.addEventListener("input", async () => {
+    const query = input.value.trim();
+    if (!query) return (list.innerHTML = '');
+
+    const matches = await fetch(`/search-addresses?query=${encodeURIComponent(query)}`).then(res => res.json());
+    list.innerHTML = matches.map(match =>
+      `<li class="autocomplete-item" data-address="${match.address}">${match.address} — ${match.resident}</li>`
+    ).join('');
+  });
+
+  input?.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearchSubmit(input, list);
+    }
+  });
+
+  searchBtn?.addEventListener("click", () => handleSearchSubmit(input, list));
+  list?.addEventListener("click", e => {
+    const item = e.target.closest(".autocomplete-item");
+    if (!item) return;
+    input.value = item.dataset.address;
+    handleSearchSubmit(input, list);
+  });
+}
+
+async function handleSearchSubmit(input, list) {
+  const query = input.value.trim();
+  if (!query) return;
+  const matches = await fetch(`/search-addresses?query=${encodeURIComponent(query)}`).then(res => res.json());
+  if (!matches.length) return alert("No address match found.");
+  showMatchResult(matches[0]);
+  list.innerHTML = '';
 }
 
 function formatCurrency(val) {
   const num = parseFloat(val);
   return isNaN(num) ? 'N/A' : `$${num.toLocaleString()}`;
 }
-document.getElementById("download-pdf-btn").classList.remove("hidden");
 
+// 📄 PDF Export
 document.getElementById("download-pdf-btn")?.addEventListener("click", () => {
+  if (!currentMatch) return;
   const element = document.createElement("div");
   element.innerHTML = `
     <h2>🏡 Property Report</h2>
-    <p><strong>Address:</strong> ${match.address}</p>
-    <p><strong>Resident:</strong> ${match.resident}</p>
-    <p><strong>All Owners:</strong> ${match.all_owners}</p>
-    <p><strong>Subdivision:</strong> ${match.subdivision}</p>
-    <p><strong>Year Built:</strong> ${match.year_built}</p>
-    <p><strong>Bedrooms:</strong> ${match.bedrooms}</p>
-    <p><strong>Baths:</strong> ${match.baths}</p>
-    <p><strong>Lot Size:</strong> ${match.lot_size_sqft}</p>
-    <p><strong>Zoning:</strong> ${match.zoning}</p>
-    <p><strong>Garage:</strong> ${match.garage_type}</p>
-    <p><strong>Pool:</strong> ${match.pool}</p>
-    <p><strong>Fireplace:</strong> ${match.fireplace}</p>
-    <p><strong>Stories:</strong> ${match.stories}</p>
-    <p><strong>Acreage:</strong> ${match.acreage}</p>
-    <p><strong>Purchase Date:</strong> ${match.purchase_date}</p>
+    <p><strong>Address:</strong> ${currentMatch.address}</p>
+    <p><strong>Resident:</strong> ${currentMatch.resident}</p>
+    <p><strong>All Owners:</strong> ${currentMatch.all_owners}</p>
+    <p><strong>Subdivision:</strong> ${currentMatch.subdivision}</p>
+    <p><strong>Year Built:</strong> ${currentMatch.year_built}</p>
+    <p><strong>Bedrooms:</strong> ${currentMatch.bedrooms}</p>
+    <p><strong>Baths:</strong> ${currentMatch.baths}</p>
+    <p><strong>Lot Size:</strong> ${currentMatch.lot_size_sqft}</p>
+    <p><strong>Zoning:</strong> ${currentMatch.zoning}</p>
+    <p><strong>Garage:</strong> ${currentMatch.garage_type}</p>
+    <p><strong>Pool:</strong> ${currentMatch.pool}</p>
+    <p><strong>Fireplace:</strong> ${currentMatch.fireplace}</p>
+    <p><strong>Stories:</strong> ${currentMatch.stories}</p>
+    <p><strong>Acreage:</strong> ${currentMatch.acreage}</p>
+    <p><strong>Purchase Date:</strong> ${currentMatch.purchase_date}</p>
   `;
 
-  html2pdf()
-    .set({ margin: 0.5, filename: `${match.address}_home_facts.pdf` })
-    .from(element)
-    .save();
+  html2pdf().set({
+    margin: 0.5,
+    filename: `${currentMatch.address}_home_facts.pdf`
+  }).from(element).save();
 });

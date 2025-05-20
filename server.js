@@ -50,7 +50,21 @@ app.get('/match-location', (req, res) => {
   resident: match?.resident || '',
   deed: match?.deed || ''
 };
+app.get('/api/properties', (req, res) => {
+  // only send what you need for the map
+  const markers = residents
+    .filter(r => r.lat && r.lng)
+    .map(r => ({
+      lat: r.lat,
+      lng: r.lng,
+      address: r.address,
+      subdivision: r.subdivision
+    }));
 
+  res.json(markers);
+});
+
+  // Log to Google Sheets
 fetch(GOOGLE_SHEET_URL, {
   method: 'POST',
   body: JSON.stringify(logData),
